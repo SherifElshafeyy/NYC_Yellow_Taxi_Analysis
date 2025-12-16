@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+.env
+.venv/
+venv/
+
+# Logs
+docker/sandbox/logs/
+*.log
+
+# Large data (full taxi trip parquet files)
+docker/sandbox/spark/resources/NYC_Yellow_Taxi_Trips/
+*.parquet
+
+# Jupyter notebooks checkpoints
+.ipynb_checkpoints/
+
+# OS / editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

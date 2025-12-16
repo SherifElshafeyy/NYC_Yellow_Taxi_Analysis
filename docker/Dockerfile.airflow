@@ -1,0 +1,29 @@
+# Base Airflow image
+FROM apache/airflow:2.8.2
+
+# Switch to root to install system packages
+USER root
+
+# Install Java (required for spark-submit) and procps (ps command)
+RUN apt-get update && \
+    apt-get install -y openjdk-17-jdk procps curl && \
+    rm -rf /var/lib/apt/lists/*
+
+# Set JAVA_HOME
+ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+ENV PATH=$PATH:$JAVA_HOME/bin
+
+# Install Spark binaries (same version as your cluster)
+# This step will cache the downloaded file; if unchanged, it won't re-download
+RUN curl -L https://archive.apache.org/dist/spark/spark-3.5.1/spark-3.5.1-bin-hadoop3.tgz \
+    | tar -xz -C /opt/ && \
+    ln -s /opt/spark-3.5.1-bin-hadoop3 /opt/spark
+
+ENV SPARK_HOME=/opt/spark
+ENV PATH=$PATH:$SPARK_HOME/bin
+
+# Switch back to airflow user
+USER airflow
+
+# Install Apache Spark Airflow provider
+RUN pip install apache-airflow-providers-apache-spark --no-cache-dir
