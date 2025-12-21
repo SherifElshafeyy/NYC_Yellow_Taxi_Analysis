@@ -15,7 +15,7 @@ docker/sandbox/logs/
 # Large data (full taxi trip parquet files)
 docker/sandbox/spark/resources/NYC_Yellow_Taxi_Trips/
 *.parquet
-
+docker/sandbox/spark/resources/NYC_Yellow_Taxi_Trips_Cleaned/
 # Jupyter notebooks checkpoints
 .ipynb_checkpoints/
 
