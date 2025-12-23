@@ -13,7 +13,6 @@ with DAG(
         task_id="spark_submit_task",
         application="/opt/spark/app/sample_spark_job.py",
         name="spark_test_job",
-        deploy_mode="client",
-        conf={"spark.master": "spark://spark-master:7077"},
-        verbose=True,
+        conn_id="spark_default",
+        verbose=False,
     )
