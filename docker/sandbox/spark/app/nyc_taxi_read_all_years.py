@@ -51,13 +51,21 @@ def load_year_standardized(spark: SparkSession, year: int, max_month: int) -> Da
     return reduce(lambda df1, df2: df1.unionByName(df2), dfs_list)
 
 def main():
-    spark = (
-        SparkSession.builder
-        .appName("NYC_Taxi_Union_All_Years")
-        .master("spark://spark-master:7077")
-        .config("spark.hadoop.fs.permissions.enabled", "false")
+    spark = SparkSession.builder \
+        .appName("NYC_Union_All_Years") \
+        .master("spark://spark-master:7077") \
+        .config("spark.jars", "/opt/spark/jars/hadoop-aws-3.3.4.jar,/opt/spark/jars/aws-java-sdk-bundle-1.12.367.jar") \
+        .config("spark.driver.extraClassPath", "/opt/spark/jars/*") \
+        .config("spark.executor.extraClassPath", "/opt/spark/jars/*") \
+        .config("spark.python.worker.reuse", "false") \
+        .config("spark.sql.execution.arrow.pyspark.enabled", "false") \
+        .config("spark.hadoop.fs.s3a.endpoint", "http://minio:9000") \
+        .config("spark.hadoop.fs.s3a.access.key", "minioadmin") \
+        .config("spark.hadoop.fs.s3a.secret.key", "minioadmin") \
+        .config("spark.hadoop.fs.s3a.path.style.access", "true") \
+        .config("spark.hadoop.fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem") \
+        .config("spark.hadoop.fs.s3a.connection.ssl.enabled", "false") \
         .getOrCreate()
-    )
 
     
     
@@ -65,23 +73,23 @@ def main():
         
     print("Loading year 2022...")
     df_2022_std = load_year_standardized(spark, 2022, 12)
-    count_2022 = df_2022_std.count()
-    print(f"2022 loaded: {count_2022} records")
+    
+    
         
     print("Loading year 2023...")
     df_2023_std = load_year_standardized(spark, 2023, 12)
-    count_2023 = df_2023_std.count()
-    print(f"2023 loaded: {count_2023} records")
+    
+    
         
     print("Loading year 2024...")
     df_2024_std = load_year_standardized(spark, 2024, 12)
-    count_2024 = df_2024_std.count()
-    print(f"2024 loaded: {count_2024} records")
+    
+    
         
     print("Loading year 2025...")
     df_2025_std = load_year_standardized(spark, 2025, 10)
-    count_2025 = df_2025_std.count()
-    print(f"2025 loaded: {count_2025} records")
+    
+    
 
     # Schema check
     schema_match = (df_2022_std.schema == df_2023_std.schema == 
@@ -99,10 +107,10 @@ def main():
 
     # Write to staging
     print("Writing to staging location...")
-    df_all_years_staged.coalesce(1).write.mode("overwrite").parquet("/tmp/Staging_output")
+    df_all_years_staged.coalesce(2).write.mode("overwrite").parquet("s3a://nyc/raw_data_std_schema")
         
     print("SUCCESS: Staging write completed")
-    print(f"Total records: {count_2022 + count_2023 + count_2024 + count_2025}")
+
         
     
     spark.stop()

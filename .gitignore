@@ -12,7 +12,7 @@ spark-jars/
 # Logs
 docker/sandbox/logs/
 *.log
-
+minio_date/
 # Large data (full taxi trip parquet files)
 docker/sandbox/spark/resources/NYC_Yellow_Taxi_Trips/
 *.parquet

@@ -1,27 +1,35 @@
 from pyspark.sql import SparkSession, functions as f
 
 def main():
-    spark = (
-        SparkSession.builder
-        .appName("NYC_Taxi_Clean_Data")
-        .master("spark://spark-master:7077")
+    spark = SparkSession.builder \
+        .appName("NYC_Data_Cleaning") \
+        .master("spark://spark-master:7077") \
+        .config("spark.jars", "/opt/spark/jars/hadoop-aws-3.3.4.jar,/opt/spark/jars/aws-java-sdk-bundle-1.12.367.jar") \
+        .config("spark.driver.extraClassPath", "/opt/spark/jars/*") \
+        .config("spark.executor.extraClassPath", "/opt/spark/jars/*") \
+        .config("spark.python.worker.reuse", "false") \
+        .config("spark.sql.execution.arrow.pyspark.enabled", "false") \
+        .config("spark.hadoop.fs.s3a.endpoint", "http://minio:9000") \
+        .config("spark.hadoop.fs.s3a.access.key", "minioadmin") \
+        .config("spark.hadoop.fs.s3a.secret.key", "minioadmin") \
+        .config("spark.hadoop.fs.s3a.path.style.access", "true") \
+        .config("spark.hadoop.fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem") \
+        .config("spark.hadoop.fs.s3a.connection.ssl.enabled", "false") \
         .getOrCreate()
-    )
 
-    try:
-        # Disable Hadoop permission checks to avoid chmod errors in containerized environment
-        spark.sparkContext._jsc.hadoopConfiguration().setBoolean("fs.permissions.enabled", False)
+    
         
-        # Read the output from nyc_taxi_read_all_years.py
-        print("Reading staging output...")
-        df = spark.read.parquet("/tmp/Staging_output")
-        original_count = df.count()
-        print(f"Loaded {original_count} records from staging output")
+        
+    # Read the output from nyc_taxi_read_all_years.py
+        
+    df = spark.read.parquet("s3a://nyc/raw_data_std_schema")
+        
+        
         
         # Step 1: Rename columns and add trip_duration_min
-        print("Step 1: Renaming columns and calculating trip duration...")
-        df_col_renamed = (
-            df
+    print("Step 1: Renaming columns and calculating trip duration...")
+    df_col_renamed = (
+        df
             .withColumnRenamed("VendorID", "Vendor_ID")
             .withColumnRenamed("RatecodeID", "Ratecode_ID")
             .withColumnRenamed("PULocationID", "Pickup_Location_ID")
@@ -39,10 +47,10 @@ def main():
         )
         
         # Step 2: Fill null values
-        print("Step 2: Filling null values...")
-        mean_tip = df_col_renamed.select(f.mean("tip_amount")).collect()[0][0]
+    print("Step 2: Filling null values...")
+    mean_tip = df_col_renamed.select(f.mean("tip_amount")).collect()[0][0]
         
-        df_no_nulls = df_col_renamed.fillna({
+    df_no_nulls = df_col_renamed.fillna({
             'Vendor_ID': 99,
             'Ratecode_ID': 99,
             'store_and_fwd_flag': 'Unknown',
@@ -54,8 +62,8 @@ def main():
         })
         
         # Step 3: Filter bad data
-        print("Step 3: Filtering bad data...")
-        df_filtered = df_no_nulls.filter(
+    print("Step 3: Filtering bad data...")
+    df_filtered = df_no_nulls.filter(
             (f.col("passenger_count").between(1, 6)) &
             (f.col("trip_distance").between(0.1, 200)) &
             (f.col("Pickup_Location_ID") != f.col("Dropoff_Location_ID")) &
@@ -71,8 +79,8 @@ def main():
         )
         
         # Step 4: Add derived columns
-        print("Step 4: Adding derived columns...")
-        df_derived_col = (
+    print("Step 4: Adding derived columns...")
+    df_derived_col = (
             df_filtered
             .withColumn(
                 "Vendor_Name",
@@ -119,8 +127,8 @@ def main():
         )
         
         # Step 5: Read lookup zones
-        print("Step 5: Reading lookup zones...")
-        lookup_zones_df = (
+    print("Step 5: Reading lookup zones...")
+    lookup_zones_df = (
             spark.read
             .option("header", "true")
             .option("inferschema", "True")
@@ -128,11 +136,11 @@ def main():
         )
         
         # Step 6: Join with lookup zones
-        print("Step 6: Joining with lookup zones...")
-        pickup_zone = lookup_zones_df.alias('pickup')
-        dropoff_zone = lookup_zones_df.alias('dropoff')
+    print("Step 6: Joining with lookup zones...")
+    pickup_zone = lookup_zones_df.alias('pickup')
+    dropoff_zone = lookup_zones_df.alias('dropoff')
         
-        df_joined = df_derived_col \
+    df_joined = df_derived_col \
             .join(
                 pickup_zone,
                 df_derived_col['Pickup_Location_ID'] == pickup_zone['LocationID'],
@@ -154,8 +162,8 @@ def main():
             )
         
         # Step 7: Select final columns
-        print("Step 7: Selecting final columns...")
-        final_df = df_joined.select(
+    print("Step 7: Selecting final columns...")
+    final_df = df_joined.select(
             'Vendor_ID',
             'Vendor_Name',
             'Trip_Pickup_DateTime',
@@ -190,25 +198,16 @@ def main():
             'Month'
         )
         
-        # Step 8: Print statistics
-        print("Step 8: Calculating statistics...")
-        final_count = final_df.count()
+
         
-        print(f"Number of records of original df: {original_count}")
-        print(f"Number of records after Cleaning Data: {final_count}")
-        print(f"Number of filtered records: {original_count - final_count}")
-        print(f"Percentage of bad data from whole data: {(original_count - final_count) / original_count * 100:.2f}%")
+    print(f"Final records of cleaned_data is {final_df.count()}")
         
-        # Step 9: Save cleaned dataframe
-        print("Step 9: Saving cleaned dataframe to /tmp/Cleaned_data...")
-        final_df.coalesce(1).write.mode("overwrite").parquet("/tmp/Cleaned_data")
+    final_df.coalesce(2).write.mode("overwrite").parquet("s3a://nyc/cleaned_data")
         
-        print("SUCCESS: Data cleaning completed and saved to /tmp/Cleaned_data")
+        
         
 
-        spark.stop()
+    spark.stop()
 
 if __name__ == "__main__":
     main()
-
-

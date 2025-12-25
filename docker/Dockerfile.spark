@@ -1,0 +1,8 @@
+FROM apache/spark:3.5.1
+
+USER root
+
+# Copy the JARs to Spark's jars directory
+COPY ./sandbox/spark-jars/*.jar /opt/spark/jars/
+
+USER ${spark_uid}
