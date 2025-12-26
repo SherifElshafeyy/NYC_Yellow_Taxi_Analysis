@@ -8,6 +8,7 @@ __pycache__/
 .venv/
 venv/
 spark-jars/
+trino/
 
 # Logs
 docker/sandbox/logs/
