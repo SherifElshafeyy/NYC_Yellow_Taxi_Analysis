@@ -210,7 +210,17 @@ services:
       interval: 30s
       timeout: 20s
       retries: 3
-
+  trino:
+    image: trinodb/trino:447
+    container_name: trino
+    ports:
+      - "8085:8080"
+    volumes:
+      - ./trino/etc:/etc/trino
+      - ./trino/data:/data
+    networks:
+      - spark-network
+  
 
 volumes:
   postgres_data:
