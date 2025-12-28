@@ -29,3 +29,4 @@ USER airflow
 
 # Install Apache Spark Airflow provider and MinIO client
 RUN pip install apache-airflow-providers-apache-spark minio --no-cache-dir
+RUN pip install apache-airflow-providers-trino --no-cache-dir
