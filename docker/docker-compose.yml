@@ -1,4 +1,3 @@
-version: '3.9'
 
 services:
   # PostgreSQL for Airflow
@@ -153,7 +152,7 @@ services:
     depends_on:
       - spark-master
     environment:
-      - SPARK_WORKER_MEMORY=4G
+      - SPARK_WORKER_MEMORY=3G
       - SPARK_WORKER_CORES=2
       - SPARK_MASTER=spark://spark-master:7077
       
@@ -220,10 +219,27 @@ services:
       - ./trino/data:/data
     networks:
       - spark-network
-  
+
+
+  metabase:
+    image: metabase/metabase:latest
+    container_name: metabase
+    ports:
+      - "3000:3000"   # Metabase UI port
+    environment:
+      - MB_DB_FILE=/metabase-data/metabase.db
+    volumes:
+      - ./metabase-data:/metabase-data
+    networks:
+      - spark-network
+    restart: always
+
 
 volumes:
   postgres_data:
+
+
+
 
 networks:
   spark-network:
