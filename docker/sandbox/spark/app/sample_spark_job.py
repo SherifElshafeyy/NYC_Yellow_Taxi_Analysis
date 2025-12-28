@@ -20,7 +20,7 @@ spark = SparkSession.builder \
 df = spark.read.parquet("/opt/spark/resources/NYC_Yellow_Taxi_Trips/2022/yellow_tripdata_2022-01.parquet")
 print(f"✅ Read {df.count()} rows")
 
-df.write.mode("overwrite").parquet("s3a://data/output/my_data.parquet")
+df.write.mode("overwrite").parquet("s3a://test/test_data")
 print("✅ Success! Written to MinIO")
 
 spark.stop()
