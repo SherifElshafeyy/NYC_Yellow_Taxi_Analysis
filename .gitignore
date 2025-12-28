@@ -9,6 +9,7 @@ __pycache__/
 venv/
 spark-jars/
 trino/
+metabase-data/
 
 # Logs
 docker/sandbox/logs/
