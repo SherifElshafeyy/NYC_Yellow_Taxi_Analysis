@@ -152,7 +152,7 @@ services:
     depends_on:
       - spark-master
     environment:
-      - SPARK_WORKER_MEMORY=3G
+      - SPARK_WORKER_MEMORY=4G
       - SPARK_WORKER_CORES=2
       - SPARK_MASTER=spark://spark-master:7077
       
@@ -238,9 +238,8 @@ services:
 volumes:
   postgres_data:
 
-
-
-
 networks:
   spark-network:
     driver: bridge
+
+    
