@@ -11,6 +11,7 @@ spark-jars/
 trino/
 metabase-data/
 *.pdf
+NYC_Yellow_Taxi_analysis.drawio
 # Logs
 docker/sandbox/logs/
 *.log
