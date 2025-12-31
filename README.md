@@ -274,7 +274,7 @@ Records are filtered based on:
 ## 📊 Dashboards
 
 ### 1. Time Analysis
-![Time Dashboard](docker\sandbox\results\metabase_Dashboard_NYC_Yellow_Taxi_Time_Analysis.png.png)
+![Time Dashboard](docker/sandbox/results/metabase_Dashboard_NYC_Yellow_Taxi_Time_Analysis.png.png)
 
 **Insights:**
 - 130.9M total trips generating $3.6B revenue
@@ -285,7 +285,7 @@ Records are filtered based on:
 
 
 ### 2. Location Analysis
-![Location Dashboard](docker\sandbox\results\metabase_Dashboard_NYC_Yellow_Location_Analysis.png.png)
+![Location Dashboard](docker/sandbox/results/metabase_Dashboard_NYC_Yellow_Location_Analysis.png.png)
 
 **Insights:**
 - Manhattan dominates with ~89% of both pickups and dropoffs
@@ -293,7 +293,7 @@ Records are filtered based on:
 - Queens accounts for ~10% of trips, primarily airport-related
 
 ### 2. Vendor & Payment Analysis
-![Payment Dashboard](docker\sandbox\results\metabase_Dashboard_NYC_Yellow_Taxi_Payment_Analysis.png)
+![Payment Dashboard](docker/sandbox/results/metabase_Dashboard_NYC_Yellow_Taxi_Payment_Analysis.png)
 
 **Insights:**
 - Curb Mobility, LLC handles 77% of trips
@@ -393,15 +393,6 @@ ORDER BY Year, Month;
 - [Trino Documentation](https://trino.io/docs/current/)
 - [MinIO Documentation](https://min.io/docs/minio/linux/index.html)
 - [Metabase Documentation](https://www.metabase.com/docs/latest/)
-
-## 🤝 Contributing
-
-Contributions are welcome! Feel free to:
-- Report bugs
-- Suggest new features
-- Submit pull requests
-- Improve documentation
-
 
 
 ## 👤 Author
