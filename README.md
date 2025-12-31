@@ -2,7 +2,7 @@
 
 A comprehensive data engineering project analyzing NYC Yellow Taxi trip data from 2022-2025 using Apache Spark, Airflow, MinIO, Trino, and Metabase. This project processes over 159 million taxi trip records to provide insights into location patterns, payment trends, and temporal analysis.
 
-![Project Architecture](docker\sandbox\results\NYC_Yellow_Taxi_analysis_Diagram.png)
+![Project Architecture](docker/sandbox/results/NYC_Yellow_Taxi_analysis_Diagram.png)
 
 ## 📊 Project Overview
 
